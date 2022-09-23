@@ -14,6 +14,7 @@ public class AuthController : ControllerBase
     }
 
     public FirestoreDb _db { get; }
+
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] string token)
     {
@@ -29,6 +30,7 @@ public class AuthController : ControllerBase
 
         var ticket = snapshot[0];
         var expiry = ticket.GetValue<Timestamp>("expiry").ToProto();
+        if (DateTime.UtcNow >= expiry.ToDateTime()) return Unauthorized();
         var claims = new Dictionary<string, object>()
         {
             {
